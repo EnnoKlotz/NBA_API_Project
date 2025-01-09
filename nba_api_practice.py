@@ -88,33 +88,28 @@ def get_player_experience(player_ids, output_csv='active_player_experience.csv')
     return player_dict
 
 # Calling the player experance function 
-player_experience = get_player_experience(player_ids)
+#player_experience = get_player_experience(player_ids)
 
 
 
 # Getting all the home and away games 
-def get_home_and_away_games(player_ids, season="2023-24", save_csv=False, output_dir="output"):
+def get_home_and_away_games(player_ids, season="2023-24", save_csv=False, home_csv="home_games.csv", away_csv="away_games.csv"):
     """
     Retrieves home and away game logs for a list of NBA player IDs for a given season
-    and optionally saves them as separate CSV files.
+    and optionally saves them as two separate CSV files.
 
     Parameters:
         player_ids (list): List of player IDs to retrieve game logs for.
         season (str): NBA season in "YYYY-YY" format. Default is "2023-24".
-        save_csv (bool): If True, saves the home and away game DataFrames as CSV files. Default is False.
-        output_dir (str): Directory where CSV files will be saved. Default is "output".
+        save_csv (bool): If True, saves the combined home and away game DataFrames as CSV files. Default is False.
+        home_csv (str): File path for the home games CSV. Default is "home_games.csv".
+        away_csv (str): File path for the away games CSV. Default is "away_games.csv".
 
     Returns:
-        tuple: Two lists containing DataFrames:
-               - home_games: List of DataFrames for home games for each player.
-               - away_games: List of DataFrames for away games for each player.
+        tuple: Two DataFrames:
+               - home_games_df: DataFrame of all home games for all players.
+               - away_games_df: DataFrame of all away games for all players.
     """
-    import os
-
-    # Create output directory if saving CSVs
-    if save_csv and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
     home_games = []
     away_games = []
 
@@ -135,25 +130,30 @@ def get_home_and_away_games(player_ids, season="2023-24", save_csv=False, output
         away_games.append(temp_away_games_df)
         home_games.append(temp_home_games_df)
 
-        # Save to CSV if required
-        if save_csv:
-            away_csv_path = os.path.join(output_dir, f"player_{i}_away_games.csv")
-            home_csv_path = os.path.join(output_dir, f"player_{i}_home_games.csv")
-
-            temp_away_games_df.to_csv(away_csv_path, index=False)
-            temp_home_games_df.to_csv(home_csv_path, index=False)
-
-            print(f"Saved CSVs for Player ID {i}: {away_csv_path}, {home_csv_path}")
-
         # Print progress
         print(f"Player ID {i}: {len(temp_away_games_df)} away games, {len(temp_home_games_df)} home games.")
         time.sleep(2)  # Pause between API requests to avoid rate limits
 
-    return home_games, away_games
+    # Combine all players' games into single DataFrames
+    home_games_df = pd.concat(home_games, ignore_index=True)
+    away_games_df = pd.concat(away_games, ignore_index=True)
+
+    # Save to CSV if required
+    if save_csv:
+        home_games_df.to_csv(home_csv, index=False)
+        away_games_df.to_csv(away_csv, index=False)
+        print(f"Saved home games to {home_csv} and away games to {away_csv}.")
+
+    return home_games_df, away_games_df
+
 
 #calling the home & away games function 
-home_games, away_games = get_home_and_away_games(player_ids[:5], save_csv=True, output_dir="game_logs")
-
+home_games_df, away_games_df = get_home_and_away_games(
+    player_ids, 
+    save_csv=True, 
+    home_csv="all_home_games.csv", 
+    away_csv="all_away_games.csv"
+)
 
 
 
