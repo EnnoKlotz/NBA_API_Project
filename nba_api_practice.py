@@ -1,44 +1,64 @@
 
 from nba_api.stats.endpoints import commonplayerinfo
+from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playergamelog
-from nba_api.stats.static import players
 import pandas as pd
 import time
 import csv
 
 
-def export_active_nba_players(output_csv='active_nba_players.csv'):
+def nba_playerid_by_season(season='2023-24', output_csv='nba_players_by_season.csv'):
     """
-    Fetches the list of all active NBA players, saves it as a CSV file, 
-    and returns a list of their player IDs.
+    Fetches the list of all NBA players active during a given season, 
+    saves it as a CSV file, and returns a list of their player IDs.
 
     Parameters:
-        output_csv (str): File name for the output CSV. Default is 'active_nba_players.csv'.
+        season (str): The NBA season in 'YYYY-YY' format. Default is '2023-24'.
+        output_csv (str): File name for the output CSV. Default is 'nba_players_by_season.csv'.
 
     Returns:
-        list: A list of player IDs for all active NBA players.
+        list: A list of player IDs for players active during the specified season.
     """
-    # Get a list of all active NBA players
-    active_players = players.get_active_players()
+    # Convert season to numeric start year (e.g. '2023-24' -> 2023)
+    season_start_year = int(season.split('-')[0])
 
-    # Convert the active_players variable to a DataFrame for easier export
-    active_players_df = pd.DataFrame(active_players)
+    # Fetch all players (both historical and current)
+    players_response = commonallplayers.CommonAllPlayers(
+        # Fetch historical data as well
+        is_only_current_season=0,  
+        league_id='00',          
+        season=season
+    )
+    # Converting to a DataFrame
+    players_data = players_response.get_data_frames()[0]  
 
-    # Write a CSV file that contains all active players
-    active_players_df.to_csv(output_csv, index=False)
-    print(f"CSV file created: {output_csv}")
+    # Ensure FROM_YEAR and TO_YEAR are integers
+    players_data['FROM_YEAR'] = pd.to_numeric(players_data['FROM_YEAR'], errors='coerce')
+    players_data['TO_YEAR'] = pd.to_numeric(players_data['TO_YEAR'], errors='coerce')
 
-    # Get a list of all active NBA players' season IDs
-    player_ids = [player['id'] for player in active_players]
+    # Filter players active during the specified season
+    active_players = players_data[
+        (players_data['FROM_YEAR'] <= season_start_year) &
+        (players_data['TO_YEAR'] >= season_start_year) &
+        # Only rostered players
+        (players_data['ROSTERSTATUS'] == 1)  
+    ]
 
-    # Ensuring no player data was lost
-    print(f"Number of player IDs: {len(player_ids)}")
+    # Save the filtered data to a CSV file
+    active_players.to_csv(output_csv, index=False)
+    print(f"Filtered CSV file created: {output_csv}")
+
+    # Extract player IDs for the given season
+    player_ids = active_players['PERSON_ID'].tolist()
+    print(f"Number of player IDs for season {season}: {len(player_ids)}")
 
     return player_ids
 
+
 #Calling the player_id function 
-player_ids = export_active_nba_players(output_csv='nba_active_players.csv')
-print(player_ids)
+#player_ids = nba_playerid_by_season(season='2023-24', output_csv='nba_players_2023_24.csv')
+
+
 
 
 def get_player_experience(player_ids, output_csv='active_player_experience.csv'):
