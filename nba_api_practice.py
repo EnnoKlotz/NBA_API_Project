@@ -1,4 +1,5 @@
 
+from nba_api.stats.endpoints import playercareerstats
 from nba_api.stats.endpoints import commonplayerinfo
 from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playergamelog
@@ -176,11 +177,74 @@ def get_home_and_away_games(player_ids, season="2023-24", save_csv=False, home_c
 # )
 
 
+
+def get_player_team_data(player_ids, output_csv='player_team_data.csv'):
+    """
+    Fetch team data (SEASON_ID, TEAM_ID, TEAM_ABBREVIATION) for a list of NBA players and save it as a CSV.
+
+    Parameters:
+        player_ids (list): List of player IDs to process.
+        output_csv (str): File name for the output CSV. Default is 'player_team_data.csv'.
+
+    Returns:
+        dict: A dictionary containing player IDs as keys and their season team data as values.
+    """
+    # Initialize a dictionary to store player data
+    player_team_data = {}
+
+    # Create a list to store data for the CSV export
+    csv_data = []
+
+    # Iterate over each player ID
+    for player_id in player_ids:
+        try:
+            # Fetch career stats for the current player
+            career_stats = playercareerstats.PlayerCareerStats(player_id=player_id)
+            stats_df = career_stats.get_data_frames()[0]
+
+            # Iterate over rows in the DataFrame and extract relevant information
+            for _, row in stats_df.iterrows():
+                season_id = row['SEASON_ID']
+                team_id = row['TEAM_ID']
+                team_abbr = row['TEAM_ABBREVIATION']
+
+                # Add the data to the dictionary
+                if player_id not in player_team_data:
+                    player_team_data[player_id] = []
+                player_team_data[player_id].append({
+                    'SEASON_ID': season_id,
+                    'TEAM_ID': team_id,
+                    'TEAM_ABBREVIATION': team_abbr
+                })
+
+                # Append the data for the CSV
+                csv_data.append([player_id, season_id, team_id, team_abbr])
+
+            print(f"Processed player ID: {player_id}")
+        except Exception as e:
+            print(f"Error processing player ID {player_id}: {e}")
+
+        # Pause for 2 seconds to avoid rate-limiting
+        time.sleep(2)
+
+    # Export data to CSV
+    with open(output_csv, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Player ID', 'Season ID', 'Team ID', 'Team Abbreviation'])
+        writer.writerows(csv_data)
+
+    print(f"Exported player team data to {output_csv}")
+    return player_team_data
+
+# Example usage
+player_team_dict = get_player_team_data(player_ids[:5], output_csv='player_team_data.csv')
+print(player_team_dict)
+
+
+
+
+
 #Using the above functions to gather all of the data needed 
 seasons_of_interest = ["2023-24", "2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16"]
 
 #Get the player IDs for 
-
-
-
-
