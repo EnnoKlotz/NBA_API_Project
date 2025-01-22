@@ -115,7 +115,7 @@ PERSON_ID,DISPLAY_LAST_COMMA_FIRST,DISPLAY_FIRST_LAST,ROSTERSTATUS,FROM_YEAR,TO_
 1631120,"Davison, JD",JD Davison,1,2022,2024,jd_davison,jd_davison,1610612738,Boston,Celtics,BOS,celtics,celtics,Y,11
 201942,"DeRozan, DeMar",DeMar DeRozan,1,2009,2024,demar_derozan,demar_derozan,1610612741,Chicago,Bulls,CHI,bulls,bulls,Y,00
 1628978,"DiVincenzo, Donte",Donte DiVincenzo,1,2018,2024,donte_divincenzo,donte_divincenzo,1610612752,New York,Knicks,NYK,knicks,knicks,Y,01
-1631217,"Diabate, Moussa",Moussa Diabate,1,2022,2024,moussa_diabate,moussa_diabate,1610612746,LA,Clippers,LAC,clippers,clippers,Y,11
+1631217,"Diabaté, Moussa",Moussa Diabaté,1,2022,2024,moussa_diabate,moussa_diabaté,1610612746,LA,Clippers,LAC,clippers,clippers,Y,11
 1629603,"Diakite, Mamadi",Mamadi Diakite,1,2020,2023,mamadi_diakite,mamadi_diakite,1610612752,New York,Knicks,NYK,knicks,knicks,Y,11
 1641711,"Dick, Gradey",Gradey Dick,1,2023,2024,gradey_dick,gradey_dick,1610612761,Toronto,Raptors,TOR,raptors,raptors,Y,11
 1631172,"Dieng, Ousmane",Ousmane Dieng,1,2022,2024,ousmane_dieng,ousmane_dieng,1610612760,Oklahoma City,Thunder,OKC,thunder,thunder,Y,11
@@ -359,7 +359,7 @@ PERSON_ID,DISPLAY_LAST_COMMA_FIRST,DISPLAY_FIRST_LAST,ROSTERSTATUS,FROM_YEAR,TO_
 1630168,"Okongwu, Onyeka",Onyeka Okongwu,1,2020,2024,onyeka_okongwu,onyeka_okongwu,1610612737,Atlanta,Hawks,ATL,hawks,hawks,Y,00
 1630171,"Okoro, Isaac",Isaac Okoro,1,2020,2024,isaac_okoro,isaac_okoro,1610612739,Cleveland,Cavaliers,CLE,cavaliers,cavaliers,Y,00
 203482,"Olynyk, Kelly",Kelly Olynyk,1,2013,2024,kelly_olynyk,kelly_olynyk,1610612761,Toronto,Raptors,TOR,raptors,raptors,Y,00
-1630647,"Omoruyi, Eugene",Eugene Omoruyi,1,2021,2024,eugene_omoruyi,eugene_omoruyi,1610612764,Washington,Wizards,WAS,wizards,wizards,Y,11
+1630647,"Omoruyi, Eugene",Eugene Omoruyi,1,2021,2023,eugene_omoruyi,eugene_omoruyi,1610612764,Washington,Wizards,WAS,wizards,wizards,Y,11
 1626224,"Osman, Cedi",Cedi Osman,1,2017,2023,cedi_osman,cedi_osman,1610612759,San Antonio,Spurs,SAS,spurs,spurs,Y,01
 1626162,"Oubre Jr., Kelly",Kelly Oubre Jr.,1,2015,2024,kelly_oubre_jr,kelly_oubre_jr,1610612755,Philadelphia,76ers,PHI,sixers,sixers,Y,00
 101108,"Paul, Chris",Chris Paul,1,2005,2024,chris_paul,chris_paul,1610612744,Golden State,Warriors,GSW,warriors,warriors,Y,00
