@@ -21,17 +21,27 @@ for i in seasons_of_interest:
 # Only keep unique player_ids 
 unique_playerids = set(list_of_ids)
 
+unique_playerids = list(unique_playerids)
+
+player_ids_df = pd.DataFrame(unique_playerids, columns=['Player ID'])
+
+#player_ids_df.to_csv("all_players_from_2015-2024.csv")
 
 
+player_team_data = pd.DataFrame(columns=['Player ID', 'Season', 'Team ID'])
 
-
-#player_experience = get_player_experience(player_ids, seasons_of_interest)
-
-#calling the home & away games function 
-# home_games_df, away_games_df = get_home_and_away_games(
-#     player_ids, 
-#     save_csv=True, 
-#     home_csv="all_home_games.csv", 
-#     away_csv="all_away_games.csv"
-#)
+# Getting player_id, season_id, and team_id
+for i in seasons_of_interest[:2]:  
+    # Getting the players for the given season 
+    players = nba_playerid_by_season(season= i, output_to_csv= False)
+    # Converting them to strings
+    str_players = [str(x) for x in players]
+    
+    for j in str_players[:4]:  
+        # Getting player team data
+        team_df = get_player_team_data(player_ids=[j], save_to_csv=False)
+        # Adding team data to a csv
+        player_team_data = pd.concat([player_team_data, team_df], ignore_index= True)
+        
+player_team_data = player_team_data[['Player ID', 'Season ID', 'Team ID', 'Team Abbreviation']]
 

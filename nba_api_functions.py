@@ -58,25 +58,26 @@ def nba_playerid_by_season(season='2023-24', output_to_csv= False):
 
 
 
-def get_player_experience(player_ids, season_ids, output_csv='player_experience.csv'):
+def get_player_experience(player_ids, season_ids, save_to_csv= False, output_csv= 'player_experience.csv'):
     """
     Fetch the experience data for a list of NBA players for specific seasons and save it as a CSV.
 
     Parameters:
         player_ids (list): List of player IDs to process.
         season_ids (list): List of season IDs to calculate experience for (e.g., ['2022-23', '2021-22']).
-        output_csv (str): File name for the output CSV. Default is 'active_player_experience.csv'.
+        save_to_csv (bool): Save results as a CSV file.
+        output_csv (str): File name for the output CSV. Default is 'player_experience.csv'.
 
     Returns:
-        dict: A dictionary containing player IDs and their experience for each season.
+        DataFrame: A pandas DataFrame containing player IDs and their experience for each season.
     """
-    # Dictionary to store the experience data
+    # List to store the experience data
     player_experience_list = []
 
     # Iterate over each player ID
     for player_id in player_ids:
         # Fetch career stats for the player
-        career_stats = playercareerstats.PlayerCareerStats(player_id=player_id)
+        career_stats = playercareerstats.PlayerCareerStats(player_id= player_id)
         stats_df = career_stats.get_data_frames()[0]
 
         # Iterate over each season ID
@@ -87,10 +88,10 @@ def get_player_experience(player_ids, season_ids, output_csv='player_experience.
             # Calculate the experience as the number of rows (seasons) in the filtered DataFrame
             experience = len(filtered_df.drop_duplicates(subset=['PLAYER_ID', 'SEASON_ID']))
 
-            #Checking to see if the player still is playing, if not then go to next iteration
+            # Skip players with 0 experience
             if experience == 0:
-                    print(f"Skipping Player ID: {player_id} due to 0 experience in Season: {season_id}")
-                    break
+                print(f"Skipping Player ID: {player_id} due to 0 experience in Season: {season_id}")
+                break
 
             # Append the data to the list
             player_experience_list.append({
@@ -102,14 +103,16 @@ def get_player_experience(player_ids, season_ids, output_csv='player_experience.
             print(f"Processed Player ID: {player_id} for Season: {season_id} with Experience: {experience}")
             time.sleep(2)  # Pause to avoid API rate limits
 
-    # Write the results to a CSV file
-    with open(output_csv, 'w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=['Player ID', 'Season ID', 'Experience'])
-        writer.writeheader()
-        writer.writerows(player_experience_list)
+    # Convert the list to a DataFrame
+    player_experience_df = pd.DataFrame(player_experience_list)
 
-    print(f"Exported player experience data to {output_csv}")
-    return player_experience_list
+    if save_to_csv:
+        # Save the DataFrame to a CSV file
+        player_experience_df.to_csv(output_csv, index= False)
+        print(f"Exported player experience data to {output_csv}")
+
+    return player_experience_df
+
 
 
 # Getting all the home and away games 
@@ -170,19 +173,18 @@ def get_home_and_away_games(player_ids, season="2023-24", save_csv=False, home_c
 
 
 
-def get_player_team_data(player_ids, output_csv='player_team_data.csv'):
+def get_player_team_data(player_ids, save_to_csv = False, output_csv='player_team_data.csv'):
     """
     Fetch team data (SEASON_ID, TEAM_ID, TEAM_ABBREVIATION) for a list of NBA players and save it as a CSV.
 
     Parameters:
         player_ids (list): List of player IDs to process.
         output_csv (str): File name for the output CSV. Default is 'player_team_data.csv'.
+        save_to_csv (Bool): Saving the result in a csv
 
     Returns:
         dict: A dictionary containing player IDs as keys and their season team data as values.
     """
-    import pandas as pd
-
     # Initialize a dictionary to store player data
     player_team_data = {}
 
@@ -236,8 +238,9 @@ def get_player_team_data(player_ids, output_csv='player_team_data.csv'):
     # Drop duplicate rows based on 'Player ID' and 'Season ID'
     csv_df = csv_df.drop_duplicates(subset=['Player ID', 'Season ID'])
 
-    # Export data to CSV
-    csv_df.to_csv(output_csv, index=False)
-
-    print(f"Exported player team data to {output_csv}")
-    return player_team_data
+    if save_to_csv == True: 
+        # Export data to CSV
+        csv_df.to_csv(output_csv, index=False)
+        print(f"Exported player team data to {output_csv}")
+    else:
+        return csv_df
