@@ -8,7 +8,7 @@ import time
 import csv
 
 
-def nba_playerid_by_season(season='2023-24', output_csv='nba_players_by_season.csv'):
+def nba_playerid_by_season(season='2023-24', output_to_csv= False):
     """
     Fetches the list of all NBA players active during a given season, 
     saves it as a CSV file, and returns a list of their player IDs.
@@ -45,13 +45,14 @@ def nba_playerid_by_season(season='2023-24', output_csv='nba_players_by_season.c
         (players_data['ROSTERSTATUS'] == 1)  
     ]
 
-    # Save the filtered data to a CSV file
-    active_players.to_csv(output_csv, index=False)
-    print(f"Filtered CSV file created: {output_csv}")
-
-    # Extract player IDs for the given season
-    player_ids = active_players['PERSON_ID'].tolist()
-    print(f"Number of player IDs for season {season}: {len(player_ids)}")
+    # Save the filtered data to a CSV file if scpecified 
+    if output_to_csv == True:
+        active_players.to_csv(output_csv, index=False)
+        print(f"Filtered CSV file created: {output_csv}")
+    else:
+        # Extract player IDs for the given season
+        player_ids = active_players['PERSON_ID'].tolist()
+        print(f"Number of player IDs for season {season}: {len(player_ids)}")
 
     return player_ids
 

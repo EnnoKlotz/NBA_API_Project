@@ -11,13 +11,21 @@ os.chdir(new_dir)
 
 seasons_of_interest = ["2023-24", "2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16"]
 
-#Calling the player_id function 
-player_ids = nba_playerid_by_season(season='2023-24', output_csv='nba_players_2023_24.csv')
+#Calling the player_id function for all seasons of interest
+list_of_ids = []
+for i in seasons_of_interest: 
+    player_ids = nba_playerid_by_season(season=i, output_to_csv=False)
+    #Make one big list with all data 
+    list_of_ids.extend(player_ids)
+
+# Only keep unique player_ids 
+unique_playerids = set(list_of_ids)
 
 
 
 
-player_experience = get_player_experience(player_ids, seasons_of_interest)
+
+#player_experience = get_player_experience(player_ids, seasons_of_interest)
 
 #calling the home & away games function 
 # home_games_df, away_games_df = get_home_and_away_games(
