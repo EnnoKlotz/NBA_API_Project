@@ -57,52 +57,58 @@ def nba_playerid_by_season(season='2023-24', output_csv='nba_players_by_season.c
 
 
 
-
-def get_player_experience(player_ids, output_csv='active_player_experience.csv'):
+def get_player_experience(player_ids, season_ids, output_csv='player_experience.csv'):
     """
-    Fetch the experience data (SEASON_EXP) for a list of NBA players and save it as a CSV.
+    Fetch the experience data for a list of NBA players for specific seasons and save it as a CSV.
 
     Parameters:
         player_ids (list): List of player IDs to process.
+        season_ids (list): List of season IDs to calculate experience for (e.g., ['2022-23', '2021-22']).
         output_csv (str): File name for the output CSV. Default is 'active_player_experience.csv'.
 
     Returns:
-        dict: A dictionary containing player IDs as keys and their season experience as values.
+        dict: A dictionary containing player IDs and their experience for each season.
     """
-    # Initializing an empty dataframe to store the player data
-    player_dict = {}
+    # Dictionary to store the experience data
+    player_experience_list = []
 
     # Iterate over each player ID
-    for i in player_ids:
-        # Get current player info
-        current_player_info = commonplayerinfo.CommonPlayerInfo(player_id=i)
-    
-        # Extract the dataframe of player info
-        player_info_df = current_player_info.get_data_frames()[0]
-    
-        #Create a temp dictionary that has both player ID and experance
-        temp_player_dict = dict(zip(player_info_df['PERSON_ID'], player_info_df['SEASON_EXP']))
+    for player_id in player_ids:
+        # Fetch career stats for the player
+        career_stats = playercareerstats.PlayerCareerStats(player_id=player_id)
+        stats_df = career_stats.get_data_frames()[0]
 
-        # If the dictionary is empty do not append 
-        if len(player_dict) == 0:
-            player_dict = temp_player_dict
-        else:
-            player_dict.update(temp_player_dict)
-    
-        print(f"Wokring on player: {i}")
-        # Pause for 2 seconds before the next iteration
-        time.sleep(2)
+        # Iterate over each season ID
+        for season_id in season_ids:
+            # Filter the DataFrame for seasons before or equal to the given season
+            filtered_df = stats_df[stats_df['SEASON_ID'] <= season_id]
 
-    #Exporting player experance as csv 
+            # Calculate the experience as the number of rows (seasons) in the filtered DataFrame
+            experience = len(filtered_df.drop_duplicates(subset=['PLAYER_ID', 'SEASON_ID']))
 
-    with open('active_player_experance.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Player ID', 'Season Experience'])
-        for key, value in player_dict.items():
-            writer.writerow([key, value])
+            #Checking to see if the player still is playing, if not then go to next iteration
+            if experience == 0:
+                    print(f"Skipping Player ID: {player_id} due to 0 experience in Season: {season_id}")
+                    break
 
-    print("Exported player experance data as a csv")
-    return player_dict
+            # Append the data to the list
+            player_experience_list.append({
+                'Player ID': player_id,
+                'Season ID': season_id,
+                'Experience': experience
+            })
+
+            print(f"Processed Player ID: {player_id} for Season: {season_id} with Experience: {experience}")
+            time.sleep(2)  # Pause to avoid API rate limits
+
+    # Write the results to a CSV file
+    with open(output_csv, 'w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=['Player ID', 'Season ID', 'Experience'])
+        writer.writeheader()
+        writer.writerows(player_experience_list)
+
+    print(f"Exported player experience data to {output_csv}")
+    return player_experience_list
 
 
 # Getting all the home and away games 
@@ -174,6 +180,8 @@ def get_player_team_data(player_ids, output_csv='player_team_data.csv'):
     Returns:
         dict: A dictionary containing player IDs as keys and their season team data as values.
     """
+    import pandas as pd
+
     # Initialize a dictionary to store player data
     player_team_data = {}
 
@@ -212,12 +220,23 @@ def get_player_team_data(player_ids, output_csv='player_team_data.csv'):
         # Pause for 2 seconds to avoid rate-limiting
         time.sleep(2)
 
+    # Convert csv_data into a DataFrame
+    csv_df = pd.DataFrame(csv_data, columns=['Player ID', 'Season ID', 'Team ID', 'Team Abbreviation'])
+
+    # Group by 'Player ID' and 'Season ID', and count unique teams per group
+    csv_df['Team Count'] = csv_df.groupby(['Player ID', 'Season ID'])['Team ID'].transform('nunique')
+
+    # Update rows for players with multiple teams in a season
+    csv_df.loc[csv_df['Team Count'] > 1, ['Team ID', 'Team Abbreviation']] = [0, 'TOT']
+
+    #Drop the temp column
+    csv_df.drop(columns=['Team Count'], inplace=True)
+
+    # Drop duplicate rows based on 'Player ID' and 'Season ID'
+    csv_df = csv_df.drop_duplicates(subset=['Player ID', 'Season ID'])
+
     # Export data to CSV
-    with open(output_csv, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Player ID', 'Season ID', 'Team ID', 'Team Abbreviation'])
-        writer.writerows(csv_data)
+    csv_df.to_csv(output_csv, index=False)
 
     print(f"Exported player team data to {output_csv}")
     return player_team_data
-
