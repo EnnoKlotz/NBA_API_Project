@@ -11,7 +11,7 @@ import csv
 def nba_playerid_by_season(season='2023-24', output_to_csv= False):
     """
     Fetches the list of all NBA players active during a given season, 
-    saves it as a CSV file, and returns a list of their player IDs.
+    saves it as a CSV file, and returns a list of their player IDs. 
 
     Parameters:
         season (str): The NBA season in 'YYYY-YY' format. Default is '2023-24'.
@@ -60,7 +60,7 @@ def nba_playerid_by_season(season='2023-24', output_to_csv= False):
 
 def get_player_experience(player_ids, season_ids, save_to_csv= False, output_csv= 'player_experience.csv'):
     """
-    Fetch the experience data for a list of NBA players for specific seasons and save it as a CSV.
+    Fetch the experience data for a list of NBA players for specific seasons and save it as a CSV. 
 
     Parameters:
         player_ids (list): List of player IDs to process.
@@ -101,7 +101,7 @@ def get_player_experience(player_ids, season_ids, save_to_csv= False, output_csv
             })
 
             print(f"Processed Player ID: {player_id} for Season: {season_id} with Experience: {experience}")
-            time.sleep(2)  # Pause to avoid API rate limits
+            time.sleep(1)  # Pause to avoid API rate limits
 
     # Convert the list to a DataFrame
     player_experience_df = pd.DataFrame(player_experience_list)
