@@ -1,6 +1,5 @@
 
 from nba_api.stats.endpoints import playercareerstats
-from nba_api.stats.endpoints import commonplayerinfo
 from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playergamelog
 import pandas as pd
@@ -155,7 +154,7 @@ def get_home_and_away_games(player_ids, season="2023-24", save_csv=False, home_c
 
         # Print progress
         print(f"Player ID {i}: {len(temp_away_games_df)} away games, {len(temp_home_games_df)} home games.")
-        time.sleep(2)  # Pause between API requests to avoid rate limits
+        time.sleep(1)  # Pause between API requests to avoid rate limits
 
     # Combine all players' games into single DataFrames
     home_games_df = pd.concat(home_games, ignore_index=True)
