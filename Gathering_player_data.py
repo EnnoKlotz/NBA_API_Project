@@ -60,17 +60,19 @@ unique_playerids = list(unique_playerids)
 
 
 #Getting all home and away data 
-for i in seasons_of_interest: 
-    current_season = get_home_and_away_games(player_ids = unique_playerids, season= i, save_csv= True,
-                                              home_csv=f"{i}_home_games.csv", away_csv=f"{i}away_games.csv")
+# for i in seasons_of_interest: 
+#     current_season = get_home_and_away_games(player_ids = unique_playerids, season= i, save_csv= True,
+#                                               home_csv=f"{i}_home_games.csv", away_csv=f"{i}away_games.csv")
+# print("Finshed exporting all csvs!")
+
+
+
+
+current_season = get_home_and_away_games(player_ids = unique_playerids, season= "2015-16", save_csv= True,
+                                              home_csv="2015-16_home_games.csv", away_csv="2015-16away_games.csv")
+
+
 print("Finshed exporting all csvs!")
-
-
-
-
-
-
-
  
 
 
